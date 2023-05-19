@@ -1,22 +1,31 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:transform/Globals.dart';
+import 'package:transform/plat_provider.dart';
 
 void main() {
   runApp(
-    (Globals.iOS == false)
-        ? MaterialApp(
-            debugShowCheckedModeBanner: false,
-            theme: ThemeData(
-              useMaterial3: true,
-            ),
-            home: const HomePage(),
-          )
-        : const CupertinoApp(
-            debugShowCheckedModeBanner: false,
-            home: HomePage(),
-          ),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (context) => PlatProvider()),
+      ],
+      child: Consumer<PlatProvider>(
+        builder: (context, value, child) => (value.iOS == false)
+            ? MaterialApp(
+                debugShowCheckedModeBanner: false,
+                theme: ThemeData(
+                  useMaterial3: true,
+                ),
+                home: const HomePage(),
+              )
+            : const CupertinoApp(
+                debugShowCheckedModeBanner: false,
+                home: HomePage(),
+              ),
+      ),
+    ),
   );
 }
 
@@ -30,17 +39,16 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return (Globals.iOS == false)
+    return (Provider.of<PlatProvider>(context).iOS == false)
         ? Scaffold(
             appBar: AppBar(
               title: const Text("Platform Convertor "),
               actions: [
                 Switch(
-                  value: Globals.iOS,
+                  value: Provider.of<PlatProvider>(context).iOS,
                   onChanged: (val) {
-                    setState(() {
-                      Globals.iOS = val;
-                    });
+                    Provider.of<PlatProvider>(context, listen: false)
+                        .changePlatform(val);
                   },
                 ),
               ],
@@ -85,11 +93,10 @@ class _HomePageState extends State<HomePage> {
               middle: const Text("Platform Convertor"),
               leading: const Icon(CupertinoIcons.home),
               trailing: CupertinoSwitch(
-                value: Globals.iOS,
+                value: Provider.of<PlatProvider>(context).iOS,
                 onChanged: (val) {
-                  setState(() {
-                    Globals.iOS = val;
-                  });
+                  Provider.of<PlatProvider>(context, listen: false)
+                      .changePlatform(val);
                 },
               ),
             ),
@@ -100,6 +107,13 @@ class _HomePageState extends State<HomePage> {
                     color: Colors.black, radius: 80),
                 const SizedBox(
                   height: 50,
+                ),
+                CupertinoTextSelectionToolbarButton(
+                  child: Text("Hello"),
+                  onPressed: () {},
+                ),
+                CupertinoNavigationBarBackButton(
+                  onPressed: () {},
                 ),
                 Center(
                   child: CupertinoButton(

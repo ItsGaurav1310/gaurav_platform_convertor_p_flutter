@@ -1,3 +1,3 @@
-class Globals {
-  static bool iOS = false;
-}
+// class Globals {
+//   static bool iOS = false;
+// }
